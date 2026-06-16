@@ -1,6 +1,6 @@
-# Projet d'intégration
+# Real estate manager - Odoo integration
 
-## Contexte
+## Context
 
 Exemples de projet:
 Application de sondages, application de gestionnaire de salaire, magasin vend des vinyles (gestion de stock), facturation, dépot, CRM, fiche de paie.
@@ -98,7 +98,38 @@ Gestion totale 10% HTVA (assurance loyé impayé et couverture juridique)
 Gestion propriétaire, 100% du revenu reviens à l'entreprise
 La location si elle est partielle (donc le bien n'appartient pas à l'entreprise), un revenu mensuel est perçu pour la gestion
 La location avec revenu nécessite une gestion mensuelle de la perception
+automatisation des indexations sans 
+
+Payment type :
+
+- location_month
+- purchase
+
+transaction_type   ENUM(
+                     RENT_COLLECTION,      -- loyer perçu
+                     OWNER_DISBURSEMENT,   -- reversement au proprio
+                     AGENCY_FEE,           -- commission agence
+                     MANAGEMENT_FEE        -- frais de gestion
+                   )
+
+OWNER
+TENANT
+GUARANTOR
+AGENCY
+MANAGED_OWNER
+
+CAS 1 — Agence mandate (gestion locative)
+Locataire → paie loyer → Agence → reverse (loyer - commission) → Propriétaire
+                                → garde commission
+
+CAS 2 — Agence facture ses frais de gestion
+Propriétaire → paie frais de gestion → Agence
+
+CAS 3 — Agence est propriétaire
+Locataire → paie loyer → Agence (en tant que propriétaire)
 
 ### 
 
 Gestion de domaine pour les tables de types afin de modifier le domaine une seule fois et donc créer des checks vis-à-vis de ces domaines (proche de l'enum)
+
+gestion des mini tables via un enum python ou des types pré définis python pour éviter la surcharge de la db
