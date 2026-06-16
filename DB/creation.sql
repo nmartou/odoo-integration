@@ -123,7 +123,7 @@ CREATE TABLE property_history
     start_date DATE NOT NULL,
     end_date DATE,
     property_id INTEGER NOT NULL,
-    contract_id INTEGER NOT NULL,
+    contract_id INTEGER,
 
     CONSTRAINT pk_id_property_history PRIMARY KEY(id_property_history),
     CONSTRAINT fk_property_id FOREIGN KEY(property_id) REFERENCES property(id_property),
