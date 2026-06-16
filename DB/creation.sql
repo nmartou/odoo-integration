@@ -41,6 +41,7 @@ CREATE TABLE person
     id_person SERIAL,
     first_name VARCHAR(50) NOT NULL,
     last_name VARCHAR(50) NOT NULL,
+    gender VARCHAR(1) NOT NULL,
     birth_date DATE NOT NULL,
     bank_account_id INTEGER,
     
