@@ -1,0 +1,36 @@
+import os
+from dotenv import load_dotenv
+import psycopg
+
+class DB:
+    _instance = None
+    _connection = None
+    
+    def __new__(cls):
+        if cls._instance == None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+    
+    def connect(self):
+        load_dotenv()
+        
+        USER = os.getenv("USER")
+        PASSWORD = os.getenv("PASSWORD")
+        ADDRESS = os.getenv("ADDRESS")
+        PORT = os.getenv("PORT")
+        DB_NAME = os.getenv("DB_NAME")
+
+        if USER is None or PASSWORD is None or ADDRESS is None or PORT is None or USER is None or DB_NAME is None:
+            raise ValueError("Error: database url is incorrect :", USER, PASSWORD, ADDRESS, PORT, USER, DB_NAME)
+    
+        return self.get_connection(USER, PASSWORD, ADDRESS, PORT, DB_NAME)
+    
+    def get_connection(self, user:str, password:str, address:str, port:str, db_name:str):
+        if self._instance and (self._instance._connection is None or self._instance._connection.closed):
+            self._connection = psycopg.connect(f"postgresql://{user}:{password}@{address}:{port}/{db_name}")
+        return self._connection
+    
+    def close(self):
+        if self._instance and (self._instance._connection is not None or not self._instance._connection.closed):
+            self._connection.close()
+            self._connection = None
