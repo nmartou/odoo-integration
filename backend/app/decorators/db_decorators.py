@@ -16,7 +16,7 @@ def with_cursor(model):
             
             with conn.cursor(row_factory=factory) as db:
                 try:
-                    result = func(db, *args, **kwargs)
+                    result = func(*args, db, **kwargs)
                     conn.commit()
                     return result
                 except Exception:

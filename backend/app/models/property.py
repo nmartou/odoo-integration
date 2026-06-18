@@ -1,7 +1,8 @@
 from dataclasses import dataclass
+from models.model import IModel
 
 @dataclass
-class Property:
+class Property(IModel):
     id_property: int
     price: float
     property_type: str

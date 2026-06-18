@@ -1,11 +1,17 @@
-from models.property import Property
+from models.model import IModel
+from typing import Sequence
+from tabulate import tabulate
 
 class Print:
     @staticmethod
-    def values(objs: list[Property]):
-        header = f"id_property      price       property_type       address_id"
-        print(header)
-        for i in objs:
-            val = f"{i.id_property}    {i.price}     {i.property_type}     {i.address_id}"
-            print(val)
+    def values(objs: Sequence[IModel]):
+        if len(objs) < 1:
+            raise ValueError("[Error] No objects finded :", objs)
+        keys = objs[0].__dict__.keys()
+        keys = [str(n) for n in keys]
+        values = []
+        for property in objs:
+            values.append([property.__getattribute__(n) for n in keys])
+            
+        print(tabulate(values, headers=keys))
         
