@@ -1,6 +1,7 @@
 from models.model import IModel
 from typing import Sequence
 from tabulate import tabulate
+from decorators.error import logs
 
 class Print:
     @staticmethod
@@ -16,7 +17,10 @@ class Print:
         print(tabulate(values, headers=keys))
     
     @staticmethod
+    @logs
     def value(obj: IModel):
+        if obj is None:
+            raise ValueError("[Error] object is empty")
         keys = obj.__dict__.keys()
         keys = [str(n) for n in keys]
         value = [[obj.__getattribute__(n) for n in keys]]
