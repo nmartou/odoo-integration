@@ -14,4 +14,10 @@ class Print:
             values.append([property.__getattribute__(n) for n in keys])
             
         print(tabulate(values, headers=keys))
-        
+    
+    @staticmethod
+    def value(obj: IModel):
+        keys = obj.__dict__.keys()
+        keys = [str(n) for n in keys]
+        value = [[obj.__getattribute__(n) for n in keys]]
+        print(tabulate(value, headers=keys))
