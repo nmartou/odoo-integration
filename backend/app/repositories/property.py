@@ -13,3 +13,14 @@ class PropertyRepository(IRepository):
             raise ValueError("[Error] get_properties connection is empty :", db)
         db.execute(query)
         return db.fetchall()
+    
+    @with_cursor(model=Property)
+    def get_property_by_id(self, id : int, db = None) -> Property:
+        query = "SELECT * FROM property WHERE id_property = %s"
+        if db is None:
+            raise ValueError("[Error] get_properties connection is empty :", db)
+        if id == -1:
+            raise ValueError("[Error] id is not specified :", id)
+        
+        db.execute(query, [id])
+        return db.fetchone()
