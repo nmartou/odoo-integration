@@ -3,6 +3,7 @@ from utils import Print
 from database import DB
 from models.model import IModel
 from decorators.error import logs
+import os
 
 class Main:
     def __init__(self):
@@ -13,9 +14,11 @@ class Main:
         self.main_loop()
         
     def main_loop(self):
+        self.__clear_console()
         self.__print_start_program()
 
         inp = self.__choice_want_to_do()
+        self.__clear_console()
         
         while inp != "exit":
             match inp:
@@ -25,27 +28,35 @@ class Main:
                 # GET
                 case "2":
                     table = self.__choice_tables()
+                    self.__clear_console()
                     table = table.lower()
                     while table != "exit" and table != "back":
                         match(table):
                             # Property
                             case "1":
                                 type = self.__choice_tables_type_search()
+                                self.__clear_console()
                                 while type != "exit" and type != "back":
                                     match type:
                                         # All
                                         case "1":
                                             Print.values(self.__prop_repo.get_properties())
                                             self.__print_waiting()
+                                            self.__clear_console()
                                         # By id
                                         case "2":
                                             id = self.__choice_id()
                                             Print.value(self.__prop_repo.get_property_by_id(id))
                                             self.__print_waiting()
+                                            self.__clear_console()
                                     type = self.__choice_tables_type_search()
+                                    self.__clear_console()
                                 if type == "exit":
                                     table = "exit"
-                        table = self.__choice_tables()  
+                        if table == "exit":
+                            break
+                        table = self.__choice_tables()
+                        self.__clear_console()
                     if table == "exit":
                         break
                 # POST
@@ -58,6 +69,8 @@ class Main:
                 case "5":
                     pass
             inp = self.__choice_want_to_do()
+            self.__clear_console()
+        self.__print_end_program()
         
     def __print_start_program(self):
         print("--------------------------------------")
@@ -87,9 +100,12 @@ class Main:
         print("""What do your search ?\n1: All rows\n2: Specific id\nback: Go back to previous menu\nexit: Shutdown the program\n""")
         return input()
     
-    def __exit__(self, exc_type, exc, tb):
-        print("""------------------------------\nEnd of the Real Estate Manager\n------------------------------""")
+    def __print_end_program(self):
+        print("""----------------------------------------\nEnd of the program : Real Estate Manager\n----------------------------------------""")
         
+    def __clear_console(self):
+        os.system('cls' if os.name=='nt' else 'clear')
+
 
 if __name__ == "__main__":
     db = DB()
