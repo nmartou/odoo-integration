@@ -31,6 +31,6 @@ class DB:
         return self._connection
     
     def close(self):
-        if self._instance and (self._connection is not None or not self._connection.closed):
+        if self._instance and (self._connection is not None and not self._connection.closed):
             self._connection.close()
             self._connection = None
