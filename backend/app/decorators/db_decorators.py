@@ -5,8 +5,8 @@ from decorators.error import logs
 
 def with_cursor(model):
     def decorator(func):
-        @wraps(func)
         @logs
+        @wraps(func)
         def wrapper(*args, **kwargs):
             conn = DB().connect()
             factory = class_row(model) if model else None

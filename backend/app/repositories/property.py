@@ -32,13 +32,15 @@ class PropertyRepository(IRepository):
     
     @logs
     @with_cursor(model=Property)
-    def add_property(self, price: float, property_type: PropertyType, address_id = None, db = None) -> Property:
-        if price < 0:
-            raise ValueError(f"[Error] get_properties - price is lower than zero : {price}")
+    def add_property(self, property: Property, db = None) -> Property:
+        if not property.check_values():
+            raise ValueError(f"[Error] add_property - Invalid property values")
+        
         query = "INSERT INTO property (price, property_type, address_id) VALUES (%s, %s, %s) RETURNING *;"
+        
         if db is None:
             raise ValueError("[Error] get_properties - connection is empty :", db)
-        db.execute(query, (price, property_type, address_id))
+        db.execute(query, (property.price, property.property_type, property.address_id))
         return db.fetchone()
     
     @logs
