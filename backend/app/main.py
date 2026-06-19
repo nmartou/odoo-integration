@@ -1,12 +1,110 @@
 from repositories.property import PropertyRepository
 from utils import Print
 from database import DB
+from models.model import IModel
+from decorators.error import logs
+
+class Main:
+    def __init__(self):
+        self.__current_objects: list[IModel] = []
+        self.__prop_repo: PropertyRepository = PropertyRepository()
+        
+    def __enter__(self):
+        self.main_loop()
+        
+    def main_loop(self):
+        self.__print_start_program()
+
+        inp = self.__choice_want_to_do()
+        
+        while inp != "exit":
+            match inp:
+                # Dashboard
+                case "1":
+                    pass
+                # GET
+                case "2":
+                    table = self.__choice_tables()
+                    table = table.lower()
+                    while table != "exit" and table != "back":
+                        match(table):
+                            # Property
+                            case "1":
+                                type = self.__choice_tables_type_search()
+                                while type != "exit" and type != "back":
+                                    match type:
+                                        # All
+                                        case "1":
+                                            Print.values(self.__prop_repo.get_properties())
+                                            self.__print_waiting()
+                                        # By id
+                                        case "2":
+                                            id = self.__choice_id()
+                                            Print.value(self.__prop_repo.get_property_by_id(id))
+                                            self.__print_waiting()
+                                    type = self.__choice_tables_type_search()
+                                if type == "exit":
+                                    table = "exit"
+                        table = self.__choice_tables()  
+                    if table == "exit":
+                        break
+                # POST
+                case "3":
+                    pass
+                # PUT
+                case "4":
+                    pass
+                # DELETE
+                case "5":
+                    pass
+            inp = self.__choice_want_to_do()
+        
+    def __print_start_program(self):
+        print("--------------------------------------")
+        print("Starting program : Real Estate Manager")
+        print("--------------------------------------\n")
+        
+    def __choice_want_to_do(self) -> str:
+        print("What do you want to do ?")
+        print("""1: NW - See dashboard\n2: Read data in tables\n3: NW - Add data in tables\n4: NW - Modify data in tables\n5: NW - Delete data from tables\nexit: Shutdown the program\n""")
+        return input()
+    
+    def __choice_tables(self) -> str:
+        print("""Which table do you want to see ?\n1: property\nback: Go back to previous menu\nexit: Shutdown the program\n""")
+        return input()
+    
+    def __print_waiting(self):
+        input("--- ENTER to continue ---\n")
+
+    @logs
+    def __choice_id(self) -> int:
+        digit = input("""What id do you searching for ?\n""")
+        while not digit.isdigit():
+            digit = input("""What id do you searching for ?\n""")
+        return int(digit)
+    
+    def __choice_tables_type_search(self) -> str:
+        print("""What do your search ?\n1: All rows\n2: Specific id\nback: Go back to previous menu\nexit: Shutdown the program\n""")
+        return input()
+    
+    def __exit__(self, exc_type, exc, tb):
+        print("""------------------------------\nEnd of the Real Estate Manager\n------------------------------""")
+        
 
 if __name__ == "__main__":
     db = DB()
-    prop_rep = PropertyRepository()
-    if prop_rep is not None:
-        Print.values(prop_rep.get_properties())
-        Print.value(prop_rep.get_property_by_id(3))
+    # prop_rep = PropertyRepository()
+    
+    # Test the repositories
+    # if prop_rep is not None:
+        # get all properties
+        # Print.values(prop_rep.get_properties())
+        # get property with id 3
+        # Print.value(prop_rep.get_property_by_id(3))
+        
+        # Check value
+        # prop_rep.get_property_by_id(-1)
+
+    Main().main_loop()
     
     db.close()

@@ -1,10 +1,12 @@
 from functools import wraps
 from database import DB
 from psycopg.rows import class_row
+from decorators.error import logs
 
 def with_cursor(model):
     def decorator(func):
         @wraps(func)
+        @logs
         def wrapper(*args, **kwargs):
             conn = DB().connect()
             factory = class_row(model) if model else None

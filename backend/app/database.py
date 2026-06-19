@@ -21,16 +21,16 @@ class DB:
         DB_NAME = os.getenv("DB_NAME")
 
         if USER is None or PASSWORD is None or HOST is None or PORT is None or DB_NAME is None:
-            raise ValueError("Error: database url is incorrect :", USER, PASSWORD, HOST, PORT, DB_NAME)
+            raise ValueError("[Error] database url is incorrect :", USER, PASSWORD, HOST, PORT, DB_NAME)
     
         return self.get_connection(USER, PASSWORD, HOST, PORT, DB_NAME)
     
-    def get_connection(self, user:str, password:str, address:str, port:str, db_name:str):
-        if self._instance and (self._instance._connection is None or self._instance._connection.closed):
-            self._connection = psycopg.connect(f"postgresql://{user}:{password}@{address}:{port}/{db_name}")
+    def get_connection(self, user:str, password:str, host:str, port:str, db_name:str):
+        if self._instance and (self._connection is None or self._connection.closed):
+            self._connection = psycopg.connect(f"postgresql://{user}:{password}@{host}:{port}/{db_name}")
         return self._connection
     
     def close(self):
-        if self._instance and (self._instance._connection is not None or not self._instance._connection.closed):
+        if self._instance and (self._connection is not None or not self._connection.closed):
             self._connection.close()
             self._connection = None

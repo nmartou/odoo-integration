@@ -5,9 +5,12 @@ from decorators.error import logs
 
 class Print:
     @staticmethod
+    @logs
     def values(objs: Sequence[IModel]):
+        if objs is None:
+            raise ValueError("[Error] values - objects is empty")
         if len(objs) < 1:
-            raise ValueError("[Error] No objects finded :", objs)
+            raise ValueError("[Error] values - No objects finded :", objs)
         keys = objs[0].__dict__.keys()
         keys = [str(n) for n in keys]
         values = []
@@ -20,7 +23,7 @@ class Print:
     @logs
     def value(obj: IModel):
         if obj is None:
-            raise ValueError("[Error] object is empty")
+            raise ValueError("[Error] value - object is empty")
         keys = obj.__dict__.keys()
         keys = [str(n) for n in keys]
         value = [[obj.__getattribute__(n) for n in keys]]
