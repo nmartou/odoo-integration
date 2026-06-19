@@ -133,3 +133,11 @@ Locataire → paie loyer → Agence (en tant que propriétaire)
 Gestion de domaine pour les tables de types afin de modifier le domaine une seule fois et donc créer des checks vis-à-vis de ces domaines (proche de l'enum)
 
 gestion des mini tables via un enum python ou des types pré définis python pour éviter la surcharge de la db
+
+## Git
+
+Get back to previous commit
+
+```bash
+git reset --soft <branch>~<number of commit to get back>
+```
