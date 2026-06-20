@@ -132,7 +132,43 @@ class Main:
                         break
                 # DELETE
                 case "5":
-                    pass
+                    table = self.__choice_tables()
+                    self.__clear_console()
+                    table = table.lower()
+                    while table != "exit" and table != "b":
+                        match(table):
+                            # Property
+                            case "1":
+                                type = self.__choice_tables_type_search_delete()
+                                self.__clear_console()
+                                while type != "exit" and type != "b":
+                                    match type:
+                                        # Delete property by id
+                                        case "1":
+                                            id = self.__choice_id()
+                                            self.__clear_console()
+                                            
+                                            property = self.__prop_repo.get_property_by_id(id)
+                                            Print.value(property)
+                                            
+                                            if self.__confirm(f"Are you sure you want to delete the property with id {property.id_property} ?"):
+                                                self.__clear_console()
+                                            
+                                                Print.value(self.__prop_repo.delete_by_id(property.id_property))
+                                                print("[Info] Property deleted successfully")
+                                                self.__print_waiting()
+                                                self.__clear_console()
+                                    self.__clear_console()
+                                    type = self.__choice_tables_type_search_delete()
+                                    self.__clear_console()
+                                if type == "exit":
+                                    table = "exit"
+                        if table == "exit":
+                            break
+                        table = self.__choice_tables()
+                        self.__clear_console()
+                    if table == "exit":
+                        break
             inp = self.__choice_want_to_do()
             self.__clear_console()
         self.__print_end_program()
@@ -144,7 +180,7 @@ class Main:
         
     def __choice_want_to_do(self) -> str:
         print("What do you want to do ?")
-        print("""1: NW - See dashboard\n2: Read data in tables\n3: NW - Add data in tables\n4: NW - Modify data in tables\n5: NW - Delete data from tables\nexit: Shutdown the program\n""")
+        print("""1: NW - See dashboard\n2: Read data in tables\n3: Add data in tables\n4: Modify data in tables\n5: Delete data from tables\nexit: Shutdown the program\n""")
         return input()
     
     def __choice_tables(self) -> str:
@@ -156,9 +192,9 @@ class Main:
 
     @logs
     def __choice_id(self) -> int:
-        digit = input("""What id do you searching for ?\n""")
+        digit = input("""Which id do you searching for ?\n""")
         while not digit.isdigit():
-            digit = input("""What id do you searching for ?\n""")
+            digit = input("""Which id are you searching for ?\n""")
         return int(digit)
 
     @logs
@@ -222,8 +258,20 @@ class Main:
         print("""What do you want to do ?\n1: Modify row\nb: Go back to previous menu\nexit: Shutdown the program\n""")
         return input()
     
+    def __choice_tables_type_search_delete(self) -> str:
+        print("""What do you want to do ?\n1: Delete row\nb: Go back to previous menu\nexit: Shutdown the program\n""")
+        return input()
+    
     def __print_end_program(self):
         print("""----------------------------------------\nEnd of the program : Real Estate Manager\n----------------------------------------""")
+        
+    def __confirm(self, message: str) -> bool:
+        print(f"{message} (y/n)")
+        choice = input()
+        while choice not in ["y", "n"]:
+            print(f"{message} (y/n)")
+            choice = input()
+        return choice == "y"
         
     def __clear_console(self):
         os.system('cls' if os.name=='nt' else 'clear')

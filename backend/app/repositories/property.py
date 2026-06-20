@@ -62,3 +62,15 @@ class PropertyRepository(IRepository):
         
         db.execute(query, (property.price, property.property_type, property.address_id, property.id_property))
         return db.fetchone()
+    
+    @logs
+    @with_cursor(model=Property)
+    def delete_by_id(self, id: int, db = None) -> Property:
+        query = "DELETE FROM property WHERE id_property = %s RETURNING *;"
+        if db is None:
+            raise ValueError("[Error] delete_by_id - connection is empty :", db)
+        if id < 1:
+            raise ValueError(f"[Error] delete_by_id - id is not correct : {id}")
+        
+        db.execute(query, [id])
+        return db.fetchone()
