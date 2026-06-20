@@ -154,7 +154,7 @@ class Main:
                                             if self.__confirm(f"Are you sure you want to delete the property with id {property.id_property} ?"):
                                                 self.__clear_console()
                                             
-                                                Print.value(self.__prop_repo.delete_by_id(property.id_property))
+                                                self.__prop_repo.delete_by_id(property.id_property)
                                                 print("[Info] Property deleted successfully")
                                                 self.__print_waiting()
                                                 self.__clear_console()
