@@ -4,6 +4,8 @@ from repositories.repository import IRepository
 from typing import Sequence
 from decorators.error import logs
 from data_types.property import PropertyType
+from decimal import Decimal
+from utils import Converter
 
 class PropertyRepository(IRepository):
     @logs
@@ -39,27 +41,24 @@ class PropertyRepository(IRepository):
         query = "INSERT INTO property (price, property_type, address_id) VALUES (%s, %s, %s) RETURNING *;"
         
         if db is None:
-            raise ValueError("[Error] get_properties - connection is empty :", db)
+            raise ValueError("[Error] add_property - connection is empty :", db)
         db.execute(query, (property.price, property.property_type, property.address_id))
         return db.fetchone()
     
     @logs
     @with_cursor(model=Property)
-    def modify_by_id(self, id: int, price: float, property_type: PropertyType, address_id: int | None = None, db = None) -> Property:
+    def modify_by_id(self, property: Property, db = None) -> Property:
         """Modify the property with a specific id
 
         Args:
-            id (int): id of the id_property
-            price (float): price of the property
-            property_type (PropertyType): property_type defined in a specific range of values
-            address_id (int | None, optional): physical address of the property. Defaults to None.
+            property (Property): The property object with updated values
             db (_type_, optional): object to use to manage the database. Defaults to None.
         """
-        if price < 0:
-            raise ValueError(f"[Error] get_properties - price is lower than zero : {price}")
-        query = "UPDATE property (price, property_type, address_id) RETURNING *;"
+        if not property.check_values():
+            raise ValueError(f"[Error] modify_by_id - Invalid property values")
+        query = "UPDATE property SET price = %s, property_type = %s, address_id = %s WHERE id_property = %s RETURNING *;"
         if db is None:
-            raise ValueError("[Error] get_properties - connection is empty :", db)
+            raise ValueError("[Error] modify_by_id - connection is empty :", db)
         
-        db.execute(query, (price, property_type, address_id))
+        db.execute(query, (property.price, property.property_type, property.address_id, property.id_property))
         return db.fetchone()

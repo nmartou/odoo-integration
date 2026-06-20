@@ -3,7 +3,7 @@ from decimal import Decimal
 from data_types.property import PropertyType
 from models.property import Property
 from repositories.property import PropertyRepository
-from utils import Print
+from utils import Converter, Print
 from database import DB
 from models.model import IModel
 from decorators.error import logs
@@ -35,13 +35,13 @@ class Main:
                     table = self.__choice_tables()
                     self.__clear_console()
                     table = table.lower()
-                    while table != "exit" and table != "back":
+                    while table != "exit" and table != "b":
                         match(table):
                             # Property
                             case "1":
                                 type = self.__choice_tables_type_search_get()
                                 self.__clear_console()
-                                while type != "exit" and type != "back":
+                                while type != "exit" and type != "b":
                                     match type:
                                         # All
                                         case "1":
@@ -69,13 +69,13 @@ class Main:
                     table = self.__choice_tables()
                     self.__clear_console()
                     table = table.lower()
-                    while table != "exit" and table != "back":
+                    while table != "exit" and table != "b":
                         match(table):
                             # Property
                             case "1":
                                 type = self.__choice_tables_type_search_post()
                                 self.__clear_console()
-                                while type != "exit" and type != "back":
+                                while type != "exit" and type != "b":
                                     match type:
                                         # Add new property
                                         case "1":
@@ -94,7 +94,42 @@ class Main:
                         break
                 # PUT
                 case "4":
-                    pass
+                    table = self.__choice_tables()
+                    self.__clear_console()
+                    table = table.lower()
+                    while table != "exit" and table != "b":
+                        match(table):
+                            # Property
+                            case "1":
+                                type = self.__choice_tables_type_search_put()
+                                self.__clear_console()
+                                while type != "exit" and type != "b":
+                                    match type:
+                                        # Modify property by id
+                                        case "1":
+                                            id = self.__choice_id()
+                                            self.__clear_console()
+                                            
+                                            property = self.__prop_repo.get_property_by_id(id)
+                                            Print.value(property)
+                                            
+                                            property.price = Converter.money_to_decimal(property.price)
+                                            property = self.__choice_update(property)
+                                            self.__clear_console()
+                                            
+                                            Print.value(self.__prop_repo.modify_by_id(property))
+                                            self.__print_waiting()
+                                            self.__clear_console()
+                                    type = self.__choice_tables_type_search_put()
+                                    self.__clear_console()
+                                if type == "exit":
+                                    table = "exit"
+                        if table == "exit":
+                            break
+                        table = self.__choice_tables()
+                        self.__clear_console()
+                    if table == "exit":
+                        break
                 # DELETE
                 case "5":
                     pass
@@ -113,7 +148,7 @@ class Main:
         return input()
     
     def __choice_tables(self) -> str:
-        print("""Which table do you want to see ?\n1: property\nback: Go back to previous menu\nexit: Shutdown the program\n""")
+        print("""Which table do you want ?\n1: property\nb: Go back to previous menu\nexit: Shutdown the program\n""")
         return input()
     
     def __print_waiting(self):
@@ -149,13 +184,42 @@ class Main:
             setattr(obj, key, value)
             
         return obj
+    
+    @logs
+    def __choice_update(self, obj: IModel) -> IModel:
+        keys = obj.__dict__.keys()
+        keys = list(keys)
+        keys.pop(0)
+        for key in keys:
+            value = input(f"Would like to update (n (no) or <new_value>) {key} :")
+            if value == "n":
+                continue
+            type_value = type(getattr(obj, key))
+            if type_value == int:
+                value = int(value)
+            elif type_value == float:
+                value = float(value)
+            elif type_value == Decimal:
+                value = Decimal(value)
+            elif type_value == PropertyType:
+                if PropertyType[value] is None:
+                    print(f"[Error] Invalid value for {key} : {value}")
+                    continue
+                
+            setattr(obj, key, value)
+            
+        return obj
 
     def __choice_tables_type_search_get(self) -> str:
-        print("""What do you want to search ?\n1: All rows\n2: Specific id\nback: Go back to previous menu\nexit: Shutdown the program\n""")
+        print("""What do you want to search ?\n1: All rows\n2: Specific id\nb: Go back to previous menu\nexit: Shutdown the program\n""")
         return input()
     
     def __choice_tables_type_search_post(self) -> str:
-        print("""What do you want to do ?\n1: Add new row\nback: Go back to previous menu\nexit: Shutdown the program\n""")
+        print("""What do you want to do ?\n1: Add new row\nb: Go back to previous menu\nexit: Shutdown the program\n""")
+        return input()
+    
+    def __choice_tables_type_search_put(self) -> str:
+        print("""What do you want to do ?\n1: Modify row\nb: Go back to previous menu\nexit: Shutdown the program\n""")
         return input()
     
     def __print_end_program(self):
