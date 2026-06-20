@@ -2,6 +2,7 @@ from models.model import IModel
 from typing import Sequence
 from tabulate import tabulate
 from decorators.error import logs
+from decimal import Decimal
 
 class Print:
     @staticmethod
@@ -28,3 +29,10 @@ class Print:
         keys = [str(n) for n in keys]
         value = [[obj.__getattribute__(n) for n in keys]]
         print(tabulate(value, headers=keys))
+        
+class Converter:
+    @staticmethod
+    @logs
+    def money_to_decimal(string: str) -> Decimal:
+        string = string.replace(",", "").replace("€", "").strip()
+        return Decimal(string)
