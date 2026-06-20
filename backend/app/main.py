@@ -45,13 +45,13 @@ class Main:
                                     match type:
                                         # All
                                         case "1":
-                                            Print.values(self.__prop_repo.get_properties())
+                                            Print.values(self.__prop_repo.get_all())
                                             self.__print_waiting()
                                             self.__clear_console()
                                         # By id
                                         case "2":
                                             id = self.__choice_id()
-                                            Print.value(self.__prop_repo.get_property_by_id(id))
+                                            Print.value(self.__prop_repo.get_all(id))
                                             self.__print_waiting()
                                             self.__clear_console()
                                     type = self.__choice_tables_type_search_get()
@@ -79,7 +79,7 @@ class Main:
                                     match type:
                                         # Add new property
                                         case "1":
-                                            Print.values(self.__prop_repo.add_property(self.__choice_add(Property)))
+                                            Print.values(self.__prop_repo.add(self.__choice_add(Property)))
                                             self.__print_waiting()
                                             self.__clear_console()
                                     type = self.__choice_tables_type_search_post()
@@ -110,7 +110,7 @@ class Main:
                                             id = self.__choice_id()
                                             self.__clear_console()
                                             
-                                            property = self.__prop_repo.get_property_by_id(id)
+                                            property = self.__prop_repo.get_by_id(id)
                                             Print.value(property)
                                             
                                             property.price = Converter.money_to_decimal(property.price)
@@ -148,7 +148,7 @@ class Main:
                                             id = self.__choice_id()
                                             self.__clear_console()
                                             
-                                            property = self.__prop_repo.get_property_by_id(id)
+                                            property = self.__prop_repo.get_by_id(id)
                                             Print.value(property)
                                             
                                             if self.__confirm(f"Are you sure you want to delete the property with id {property.id_property} ?"):

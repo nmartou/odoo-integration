@@ -10,7 +10,7 @@ from utils import Converter
 class PropertyRepository(IRepository):
     @logs
     @with_cursor(model=Property)
-    def get_properties(self, db = None) -> Sequence[Property]:
+    def get_all(self, db = None) -> Sequence[Property]:
         query = "SELECT * FROM property;"
         
         if db is None:
@@ -22,7 +22,7 @@ class PropertyRepository(IRepository):
     
     @logs
     @with_cursor(model=Property)
-    def get_property_by_id(self, id : int, db = None) -> Property:
+    def get_by_id(self, id : int, db = None) -> Property:
         query = "SELECT * FROM property WHERE id_property = %s"
         if db is None:
             raise ValueError("[Error] get_property_by_id - connection is empty :", db)
@@ -34,7 +34,7 @@ class PropertyRepository(IRepository):
     
     @logs
     @with_cursor(model=Property)
-    def add_property(self, property: Property, db = None) -> Property:
+    def add(self, property: Property, db = None) -> Property:
         if not property.check_values():
             raise ValueError(f"[Error] add_property - Invalid property values")
         
