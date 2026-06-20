@@ -16,7 +16,10 @@ class Property(IModel):
     
     @logs
     def check_values(self):
-        if self.price < 0:
+        if type(self.price) != Decimal:
+            print(f"[Error] Property model - price is not a Decimal : {type(self.price)} {self.price}")
+            return False 
+        elif self.price < 0:
             print(f"[Error] Property model - price is lower than zero : {self.price}")
             return False
         if PropertyType[self.property_type] is None:
