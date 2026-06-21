@@ -1,5 +1,7 @@
 from decimal import Decimal
 
+from backend.app.repositories.repository import IRepository
+from repositories.address import AddressRepository
 from data_types.property import PropertyType
 from models.property import Property
 from repositories.property import PropertyRepository
@@ -13,9 +15,7 @@ class Main:
     def __init__(self):
         self.__current_objects: list[IModel] = []
         self.__prop_repo: PropertyRepository = PropertyRepository()
-        
-    def __enter__(self):
-        self.main_loop()
+        self.__address_repo: AddressRepository = AddressRepository()
         
     @logs
     def main_loop(self):
@@ -39,25 +39,10 @@ class Main:
                         match(table):
                             # Property
                             case "1":
-                                type = self.__choice_tables_type_search_get()
-                                self.__clear_console()
-                                while type != "exit" and type != "b":
-                                    match type:
-                                        # All
-                                        case "1":
-                                            Print.values(self.__prop_repo.get_all())
-                                            self.__print_waiting()
-                                            self.__clear_console()
-                                        # By id
-                                        case "2":
-                                            id = self.__choice_id()
-                                            Print.value(self.__prop_repo.get_all(id))
-                                            self.__print_waiting()
-                                            self.__clear_console()
-                                    type = self.__choice_tables_type_search_get()
-                                    self.__clear_console()
-                                if type == "exit":
-                                    table = "exit"
+                                table = self.__search_in_table(self.__prop_repo)
+                            # Address
+                            case "2":
+                                table = self.__search_in_table(self.__address_repo)
                         if table == "exit":
                             break
                         table = self.__choice_tables()
@@ -73,19 +58,9 @@ class Main:
                         match(table):
                             # Property
                             case "1":
-                                type = self.__choice_tables_type_search_post()
-                                self.__clear_console()
-                                while type != "exit" and type != "b":
-                                    match type:
-                                        # Add new property
-                                        case "1":
-                                            Print.values(self.__prop_repo.add(self.__choice_add(Property)))
-                                            self.__print_waiting()
-                                            self.__clear_console()
-                                    type = self.__choice_tables_type_search_post()
-                                    self.__clear_console()
-                                if type == "exit":
-                                    table = "exit"
+                                table = self.__add_in_table(self.__prop_repo)
+                            case "2":
+                                table = self.__add_in_table(self.__address_repo)
                         if table == "exit":
                             break
                         table = self.__choice_tables()
@@ -101,29 +76,10 @@ class Main:
                         match(table):
                             # Property
                             case "1":
-                                type = self.__choice_tables_type_search_put()
-                                self.__clear_console()
-                                while type != "exit" and type != "b":
-                                    match type:
-                                        # Modify property by id
-                                        case "1":
-                                            id = self.__choice_id()
-                                            self.__clear_console()
-                                            
-                                            property = self.__prop_repo.get_by_id(id)
-                                            Print.value(property)
-                                            
-                                            property.price = Converter.money_to_decimal(property.price)
-                                            property = self.__choice_update(property)
-                                            self.__clear_console()
-                                            
-                                            Print.value(self.__prop_repo.modify_by_id(property))
-                                            self.__print_waiting()
-                                            self.__clear_console()
-                                    type = self.__choice_tables_type_search_put()
-                                    self.__clear_console()
-                                if type == "exit":
-                                    table = "exit"
+                                table = self.__modify_in_table(self.__prop_repo)
+                            # Address
+                            case "2":
+                                table = self.__modify_in_table(self.__address_repo)
                         if table == "exit":
                             break
                         table = self.__choice_tables()
@@ -139,30 +95,10 @@ class Main:
                         match(table):
                             # Property
                             case "1":
-                                type = self.__choice_tables_type_search_delete()
-                                self.__clear_console()
-                                while type != "exit" and type != "b":
-                                    match type:
-                                        # Delete property by id
-                                        case "1":
-                                            id = self.__choice_id()
-                                            self.__clear_console()
-                                            
-                                            property = self.__prop_repo.get_by_id(id)
-                                            Print.value(property)
-                                            
-                                            if self.__confirm(f"Are you sure you want to delete the property with id {property.id_property} ?"):
-                                                self.__clear_console()
-                                            
-                                                Print.value(self.__prop_repo.delete_by_id(property.id_property))
-                                                print("[Info] Property deleted successfully")
-                                                self.__print_waiting()
-                                                self.__clear_console()
-                                    self.__clear_console()
-                                    type = self.__choice_tables_type_search_delete()
-                                    self.__clear_console()
-                                if type == "exit":
-                                    table = "exit"
+                                table = self.__delete_in_table(self.__prop_repo)
+                            # Address
+                            case "2":
+                                table = self.__delete_in_table(self.__address_repo)
                         if table == "exit":
                             break
                         table = self.__choice_tables()
@@ -184,7 +120,7 @@ class Main:
         return input()
     
     def __choice_tables(self) -> str:
-        print("""Which table do you want ?\n1: property\nb: Go back to previous menu\nexit: Shutdown the program\n""")
+        print("""Which table do you want ?\n1: property\n2: address\nb: Go back to previous menu\nexit: Shutdown the program\n""")
         return input()
     
     def __print_waiting(self):
@@ -245,6 +181,101 @@ class Main:
             setattr(obj, key, value)
             
         return obj
+    
+    @logs
+    def __search_in_table(self, obj: IRepository) -> str:
+        type = self.__choice_tables_type_search_get()
+        self.__clear_console()
+        while type != "exit" and type != "b":
+            match type:
+                # All
+                case "1":
+                    Print.values(obj.get_all())
+                    self.__print_waiting()
+                    self.__clear_console()
+                # By id
+                case "2":
+                    id = self.__choice_id()
+                    Print.value(obj.get_all(id))
+                    self.__print_waiting()
+                    self.__clear_console()
+            type = self.__choice_tables_type_search_get()
+            self.__clear_console()
+        if type == "exit":
+            return "exit"
+        return ""
+    
+    @logs
+    def __add_in_table(self, obj: IRepository) -> str:
+        type = self.__choice_tables_type_search_post()
+        self.__clear_console()
+        while type != "exit" and type != "b":
+            match type:
+                # Add new property
+                case "1":
+                    Print.values(obj.add(Property))
+                    self.__print_waiting()
+                    self.__clear_console()
+            type = self.__choice_tables_type_search_post()
+            self.__clear_console()
+        if type == "exit":
+            return "exit"
+        return ""
+    
+    @logs
+    def __modify_in_table(self, obj: IRepository) -> str:
+        type = self.__choice_tables_type_search_put()
+        self.__clear_console()
+        while type != "exit" and type != "b":
+            match type:
+                # Modify property by id
+                case "1":
+                    id = self.__choice_id()
+                    self.__clear_console()
+                    
+                    property = obj.get_by_id(id)
+                    Print.value(property)
+                    
+                    property.price = Converter.money_to_decimal(property.price)
+                    property = self.__choice_update(property)
+                    self.__clear_console()
+                    
+                    Print.value(obj.modify_by_id(property))
+                    self.__print_waiting()
+                    self.__clear_console()
+            type = self.__choice_tables_type_search_put()
+            self.__clear_console()
+        if type == "exit":
+            return "exit"
+        return ""
+    
+    @logs
+    def __delete_in_table(self, obj: IRepository) -> str:
+        type = self.__choice_tables_type_search_delete()
+        self.__clear_console()
+        while type != "exit" and type != "b":
+            match type:
+                # Delete property by id
+                case "1":
+                    id = self.__choice_id()
+                    self.__clear_console()
+                    
+                    property = self.__prop_repo.get_by_id(id)
+                    Print.value(property)
+                    
+                    if self.__confirm(f"Are you sure you want to delete the property with id {property.id_property} ?"):
+                        self.__clear_console()
+                    
+                        Print.value(self.__prop_repo.delete_by_id(property.id_property))
+                        print("[Info] Property deleted successfully")
+                        self.__print_waiting()
+                        self.__clear_console()
+            self.__clear_console()
+            type = self.__choice_tables_type_search_delete()
+            self.__clear_console()
+        if type == "exit":
+            return "exit"
+        return ""
 
     def __choice_tables_type_search_get(self) -> str:
         print("""What do you want to search ?\n1: All rows\n2: Specific id\nb: Go back to previous menu\nexit: Shutdown the program\n""")
