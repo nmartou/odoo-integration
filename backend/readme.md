@@ -17,3 +17,9 @@ Install the requirements
 ```bash
 pip install -r requirements.txt
 ```
+
+Run the program from the root folder
+
+```bash
+python3 ./backend/app/main.py
+```
