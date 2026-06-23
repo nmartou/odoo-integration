@@ -3,11 +3,12 @@ from models.address import Address
 from decorators.error import logs
 from decorators.db_decorators import with_cursor
 from psycopg.errors import ForeignKeyViolation
+from typing import Sequence
 
 class AddressRepository(IRepository):
     @logs
     @with_cursor(model=Address)
-    def get_all(self, db = None) -> list[Address]:
+    def get_all(self, db = None) -> Sequence[Address]:
         query = "SELECT * FROM address;"
         
         if db is None:
@@ -38,15 +39,15 @@ class AddressRepository(IRepository):
     
     @logs
     @with_cursor(model=Address)
-    def modify_by_id(self, address: Address, db = None) -> Address:
-        if not address.check_values():
+    def modify_by_id(self, object: Address, db = None) -> Address:
+        if not object.check_values():
             raise ValueError(f"[Error] modify_by_id - Invalid address values")
         query = "UPDATE address SET street = %s, appartment_number = %s, city = %s, country = %s, postcode = %s WHERE id_address = %s RETURNING *;"
         if db is None:
             raise ValueError("[Error] modify_by_id - connection is empty :", db)
         
         try:             
-            db.execute(query, (address.street, address.appartment_number, address.city, address.country, address.postcode, address.id_address))
+            db.execute(query, (object.street, object.appartment_number, object.city, object.country, object.postcode, object.id_address))
             return db.fetchone()
         except Exception as e:
             print(f"[Error] modify_by_id - Error occurred while modifying address: {e}")
@@ -55,8 +56,8 @@ class AddressRepository(IRepository):
     
     @logs
     @with_cursor(model=Address)
-    def add(self, address: Address, db = None) -> Address:
-        if not address.check_values():
+    def add(self, object: Address, db = None) -> Address:
+        if not object.check_values():
             raise ValueError(f"[Error] add_address - Invalid address values")
         
         query = "INSERT INTO address (street, appartment_number, city, country, postcode) VALUES (%s, %s, %s, %s, %s) RETURNING *;"
@@ -64,7 +65,7 @@ class AddressRepository(IRepository):
         if db is None:
             raise ValueError("[Error] add_address - connection is empty :", db)
         try:
-            db.execute(query, (address.street, address.appartment_number, address.city, address.country, address.postcode))
+            db.execute(query, (object.street, object.appartment_number, object.city, object.country, object.postcode))
             return db.fetchone()
         except Exception as e:
             print(f"[Error] add_address - Error occurred while adding address: {e}")
@@ -72,7 +73,7 @@ class AddressRepository(IRepository):
     
     @logs
     @with_cursor(model=Address)
-    def delete_by_id(self, id: int, db = None) -> Address:
+    def delete_by_id(self, id: int, db = None):
         query = "DELETE FROM address WHERE id_address = %s;"
         if db is None:
             raise ValueError("[Error] delete_by_id - connection is empty :", db)
@@ -87,3 +88,7 @@ class AddressRepository(IRepository):
         except Exception as e:
             print(f"[Error] delete_by_id - Error occurred while deleting address: {e}")
             raise
+        
+    @logs
+    def get_model_type(self) -> type[Address]:
+        return Address

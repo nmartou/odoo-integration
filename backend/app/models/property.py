@@ -6,10 +6,10 @@ from data_types.property import PropertyType
 
 @dataclass
 class Property(IModel):
-    id_property: int = None
-    price: Decimal = Decimal("0.0")
+    id_property: int | None = None
+    price: Decimal | str = Decimal("0.0")
     property_type: str = "FIELD"
-    address_id: int = None
+    address_id: int | None = None
     
     def update_price(self, new_price):
         self.price = new_price

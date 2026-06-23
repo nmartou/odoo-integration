@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from backend.app.repositories.repository import IRepository
+from repositories.repository import IRepository
 from repositories.address import AddressRepository
 from data_types.property import PropertyType
 from models.property import Property
@@ -10,8 +10,11 @@ from database import DB
 from models.model import IModel
 from decorators.error import logs
 import os
+from typing import Generic, TypeVar
 
-class Main:
+T = TypeVar("T", bound=IModel)
+
+class Main(Generic[T]):
     def __init__(self):
         self.__current_objects: list[IModel] = []
         self.__prop_repo: PropertyRepository = PropertyRepository()
@@ -134,7 +137,7 @@ class Main:
         return int(digit)
 
     @logs
-    def __choice_add(self, object_type: IModel) -> IModel:
+    def __choice_add(self, object_type: type[T]) -> T:
         obj = object_type()
         keys = obj.__dict__.keys()
         keys = list(keys)
@@ -158,7 +161,7 @@ class Main:
         return obj
     
     @logs
-    def __choice_update(self, obj: IModel) -> IModel:
+    def __choice_update(self, obj: T) -> T:
         keys = obj.__dict__.keys()
         keys = list(keys)
         keys.pop(0)
@@ -196,7 +199,7 @@ class Main:
                 # By id
                 case "2":
                     id = self.__choice_id()
-                    Print.value(obj.get_all(id))
+                    Print.values(obj.get_all())
                     self.__print_waiting()
                     self.__clear_console()
             type = self.__choice_tables_type_search_get()
@@ -211,9 +214,10 @@ class Main:
         self.__clear_console()
         while type != "exit" and type != "b":
             match type:
-                # Add new property
+                # Add new row
                 case "1":
-                    Print.values(obj.add(Property))
+                    choice = self.__choice_add(obj.get_model_type())
+                    Print.value(obj.add(choice))
                     self.__print_waiting()
                     self.__clear_console()
             type = self.__choice_tables_type_search_post()
@@ -233,7 +237,7 @@ class Main:
                     id = self.__choice_id()
                     self.__clear_console()
                     
-                    property = obj.get_by_id(id)
+                    property: Property = obj.get_by_id(id)
                     Print.value(property)
                     
                     property.price = Converter.money_to_decimal(property.price)
